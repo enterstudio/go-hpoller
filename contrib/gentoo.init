@@ -1,0 +1,25 @@
+#!/sbin/runscript
+# Copyright 1999-2016 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Id$
+
+pid_file="/var/run/gopoller.pid"
+
+depend() {
+	need net
+	provide gohpoller
+}
+
+start() {
+	ebegin "Starting poller daemon"
+	start-stop-daemon --start --quiet --pidfile ${pid_file} --make-pidfile --background \
+		--exec /usr/local/bin/go-hpoller \
+		-- -c /etc/hpoller.toml -l /var/log/hpoller.log
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping poller daemon"
+	start-stop-daemon  --stop --pidfile ${pid_file}
+	eend $?
+}
