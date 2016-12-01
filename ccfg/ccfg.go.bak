@@ -1,0 +1,87 @@
+package ccfg
+
+import (
+	"github.com/spf13/viper"
+	_"reflect"
+	"fmt"
+)
+
+type Model struct {
+	Name		string
+	Min		int64
+	Max		int64
+	Community	string
+	Oids		map[string]string
+}
+
+type Cfg struct {
+	Dbhost		string
+	Dbuser		string
+	Dbpassword	string
+	Dbsid		string
+	Sw_root_id	int
+	Alive_param_id	int
+	WorkersCount	int
+	Interval	int64
+	Models		map[string]Model
+}
+
+func New(path *string) *Cfg {
+	
+	viper.SetConfigFile(*path)
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(err.Error())
+	}
+	
+	c := new(Cfg)
+	c.Dbhost	= viper.GetString("db.host")
+	c.Dbuser	= viper.GetString("db.user")
+	c.Dbpassword	= viper.GetString("db.password")
+	c.Dbsid		= viper.GetString("db.sid")
+	c.Sw_root_id	= viper.GetInt("db.switch_root_id")
+	c.Alive_param_id= viper.GetInt("db.alive_param_id")
+	c.WorkersCount	= viper.GetInt("workers")
+	c.Interval	= viper.GetInt64("interval")
+	
+	if( c.Dbhost == "" || c.Dbuser == "" || c.Dbpassword == "" || c.Dbsid == "" || c.Sw_root_id == 0 || c.Alive_param_id == 0 || c.WorkersCount == 0 || c.Interval == 0 ) {
+		panic( fmt.Errorf("Fatal: missing mandatory config parameters.") )
+	}
+	
+	modelsCfg := viper.Get("models").([]interface{})
+//	fmt.Printf("%v\n", modelsCfg)
+	c.Models = make(map[string]Model)
+	
+//	for num, v := range modelsCfg.(map[string]interface{}) {
+	for num, v := range modelsCfg {
+//		fmt.Printf("%d => %v\n", num, v)
+		value := v.(map[string]interface{})
+		name := value["name"].(string)
+		min := value["min"].(int64)
+		max := value["max"].(int64)
+		community := value["community"].(string)
+		if( name == "" || min == 0 || max == 0 || community == "" ) {
+			fmt.Printf("Missing required config parameters for model #%d\n", num)
+			panic("Exiting")
+		}
+		
+		var Mdl Model
+		Mdl.Name = name
+		Mdl.Min = min
+		Mdl.Max = max
+		Mdl.Community = community
+		
+		//oidsCfg := value["oids"].([]map[string]interface{})[0]
+		oidsCfg := value["oids"].([]interface{})
+		Mdl.Oids = make(map[string]string)
+		
+		for oname, oid := range oidsCfg[0].(map[string]interface{}) {
+			//fmt.Printf("\t%s => %s\n", oname, oid)
+			Mdl.Oids[oname] = oid.(string)
+		}
+		
+		c.Models[name] = Mdl
+	}
+	
+	return c
+}
