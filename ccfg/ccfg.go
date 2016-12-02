@@ -2,9 +2,7 @@ package ccfg
 
 import (
 	"github.com/spf13/viper"
-	_"reflect"
 	"fmt"
-	_ "os"
 	"io"
 	"encoding/json"
 	"html"

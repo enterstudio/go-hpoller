@@ -3,8 +3,6 @@ package worker
 import (
 	log "github.com/inconshreveable/log15"
 	"time"
-//	"strconv"
-//	"reflect"
 	"sync"
 	"strconv"
 	"fmt"

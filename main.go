@@ -1,14 +1,9 @@
 package main
 
 import (
-//	log "github.com/apsdehal/go-logger"
 	log "github.com/inconshreveable/log15"
-	_"github.com/spf13/viper"
 	"flag"
-	_"reflect"
 	"time"
-	_"log"
-	_"fmt"
 	"./ccfg"
 	"./csender"
 	"./cdb"

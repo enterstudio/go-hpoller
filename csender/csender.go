@@ -4,7 +4,6 @@ import (
 	log "github.com/inconshreveable/log15"
 	"fmt"
 	"net"
-	_"bufio"
 )
 
 type Sender struct {
